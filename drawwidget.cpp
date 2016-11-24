@@ -18,8 +18,9 @@ DrawWidget::DrawWidget(QWidget *parent) : QWidget(parent)
     _scale = 0.06;
     _linePen = QPen(QColor(10, 255, 10), 2, Qt::SolidLine, Qt::SquareCap, Qt::BevelJoin);
     _textPen = QPen(QColor(255, 10, 10), 1);
-    _pointPen = QPen(QColor(10, 10, 255), 1);
+    _pointPen = QPen(QColor(10, 10, 255), 3);
     _hullPointPen = QPen(QColor(255, 10, 10), 4);
+    _axisPen = QPen(QColor(60,60,60), 1);
 }
 
 void DrawWidget::drawPoint(QPainter & painter, QPoint point)
@@ -95,7 +96,12 @@ void DrawWidget::generatePoints()
 void DrawWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    painter.fillRect(0,0,width(),height(),Qt::white);
+    int w = width();
+    int h = height();
+    painter.fillRect(0,0,w,h,Qt::white);
+    painter.setPen(_axisPen);
+    painter.drawLine(w/2,h,w/2,0);
+    painter.drawLine(w,h/2,0,h/2);
 
     drawVector(painter,_points);
     drawHull(painter);

@@ -16,6 +16,7 @@ class DrawWidget : public QWidget
     QPen _textPen;
     QPen _pointPen;
     QPen _hullPointPen;
+    QPen _axisPen;
     QBrush _brush;
 
 public:
