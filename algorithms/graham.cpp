@@ -1,24 +1,12 @@
 #include "graham.h"
 
-namespace graham
-{
-
-int distSquare(QPoint p1, QPoint p2)
+int Graham::distSquare(QPoint p1, QPoint p2)
 {
     return (p1.x() - p2.x())*(p1.x() - p2.x()) +
            (p1.y() - p2.y())*(p1.y() - p2.y());
 }
 
-int orientation(QPoint p, QPoint q, QPoint r)
-{
-    int val = (q.y() - p.y()) * (r.x() - q.x()) -
-              (q.x() - p.x()) * (r.y() - q.y());
-
-    if (val == 0) return 0;
-    return (val > 0)? 1: 2;
-}
-
-int compare(const QPoint &p1, const QPoint &p2, const QPoint &p0)
+int Graham::compare(const QPoint &p1, const QPoint &p2, const QPoint &p0)
 {
     int o = orientation(p0, p1, p2);
     if (o == 0)
@@ -26,7 +14,7 @@ int compare(const QPoint &p1, const QPoint &p2, const QPoint &p0)
     return (o == 2)? -1: 1;
 }
 
-void sort(const QVector<QPoint> &pointsArray, QVector<int> & pointsIndexes, QPoint & p0)
+void Graham::sort(const QVector<QPoint> &pointsArray, QVector<int> & pointsIndexes, QPoint & p0)
 {
     int i = 0, j = 0, flag = 1;
     int temp;
@@ -45,7 +33,21 @@ void sort(const QVector<QPoint> &pointsArray, QVector<int> & pointsIndexes, QPoi
     return;
 }
 
-void convexHull(const QVector<QPoint> &pointsArray, QVector<int> &convexHull)
+QVector<int> Graham::reverseHull(QVector<int> hull)
+{
+    QVector<int> result;
+    for(int i=hull.size()-1; i>=0;i--){
+        result.push_back(hull[i]);
+    }
+    return result;
+}
+
+double Graham::getDelayMultiplier()
+{
+    return 100.0/_speed;
+}
+
+void Graham::convexHull(const QVector<QPoint> &pointsArray, QVector<int> &convexHull)
 {
     QVector<int> pointsIndexes;
     for(int i=0; i<pointsArray.size(); i++) {
@@ -60,7 +62,11 @@ void convexHull(const QVector<QPoint> &pointsArray, QVector<int> &convexHull)
             ymin = pointsArray[i].y();
             min = i;
         }
+        emit setPoint(pointsArray[i]);
+        this->msleep(20 * getDelayMultiplier());
     }
+    emit setPoint(pointsArray[min]);
+    this->msleep(60 * getDelayMultiplier());
 
     int temp = pointsIndexes[0];
     pointsIndexes[0] = pointsIndexes[min];
@@ -82,18 +88,43 @@ void convexHull(const QVector<QPoint> &pointsArray, QVector<int> &convexHull)
     if (newSize < 3) return;
 
     convexHull.push_front(pointsIndexes[0]);
+    emit setHull(reverseHull(convexHull));
+    this->msleep(40 * getDelayMultiplier());
     convexHull.push_front(pointsIndexes[1]);
+    emit setHull(reverseHull(convexHull));
+    this->msleep(40 * getDelayMultiplier());
     convexHull.push_front(pointsIndexes[2]);
+    emit setHull(reverseHull(convexHull));
+    this->msleep(40 * getDelayMultiplier());
 
     for (int i = 3; i < newSize; i++) {
         while (orientation(pointsArray[convexHull[1]],
                            pointsArray[convexHull[0]],
                            pointsArray[pointsIndexes[i]]) != 2) {
+            emit setHull(reverseHull(convexHull));
+            this->msleep(160 * getDelayMultiplier());
             convexHull.pop_front();
+            emit setHull(reverseHull(convexHull));
+            this->msleep(80 * getDelayMultiplier());
         }
         convexHull.push_front(pointsIndexes[i]);
+        emit setHull(reverseHull(convexHull));
+        this->msleep(80 * getDelayMultiplier());
     }
-    convexHull.push_front(pointsIndexes[0]);
 }
 
+void Graham::run()
+{
+    convexHull(_pointsArray,_convexHull);
+}
+
+void Graham::setInputData(int speed, const QVector<QPoint> &pointsArray)
+{
+    _speed = speed;
+    _pointsArray = pointsArray;
+}
+
+void Graham::setSpeed(int speed)
+{
+    _speed = speed;
 }
