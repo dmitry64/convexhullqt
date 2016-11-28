@@ -140,54 +140,63 @@ QVector<int> DivideAndConquer::merge(const QVector<QPoint> &pointsArray, QVector
         for(int j = 0; j < right.size(); j++) {
             QPoint lPoint = pointsArray[left[i]];
             QPoint rPoint = pointsArray[right[j]];
-            emit setLineRed(lPoint,rPoint);
-            this->msleep(50 * getDelayMultiplier());
-            double m = static_cast<double>(lPoint.y() - rPoint.y()) / static_cast<double>(lPoint.x() - rPoint.x());
-            double b = (m * (-lPoint.x())) + lPoint.y();
-            bool leftIsLower = true;
-            bool leftIsHigher = true;
-            bool rightIsLower = true;
-            bool rightIsHigher = true;
-            for(int k = 0; k < left.size(); k++){
-                QPoint curPoint = pointsArray[left[k]];
-                if(curPoint!=lPoint) {
-                    if(m*curPoint.x() + b > curPoint.y()) {
-                        leftIsHigher = false;
+            if(!(lPoint.x()==rPoint.x() && lPoint.y() == rPoint.y())) {
+                emit setLineRed(lPoint,rPoint);
+                this->msleep(50 * getDelayMultiplier());
+                if(lPoint.x()==rPoint.x()) {
+                    // TODO: write some code here
+                } else {
+                    double m = static_cast<double>(lPoint.y() - rPoint.y()) / static_cast<double>(lPoint.x() - rPoint.x());
+                    double b = (m * (-lPoint.x())) + lPoint.y();
+                    bool leftIsLower = true;
+                    bool leftIsHigher = true;
+                    bool rightIsLower = true;
+                    bool rightIsHigher = true;
+                    for(int k = 0; k < left.size(); k++){
+                        QPoint curPoint = pointsArray[left[k]];
+                        if(curPoint!=lPoint) {
+                            if(m*curPoint.x() + b > curPoint.y()) {
+                                leftIsHigher = false;
+                            }
+                            if(m*curPoint.x() + b < curPoint.y()) {
+                                leftIsLower = false;
+                            }
+                        }
                     }
-                    if(m*curPoint.x() + b < curPoint.y()) {
-                        leftIsLower = false;
+                    for(int k = 0; k < right.size(); k++){
+                        QPoint curPoint = pointsArray[right[k]];
+                        if(curPoint!=rPoint) {
+                            if(m*curPoint.x() + b > curPoint.y()) {
+                                rightIsHigher = false;
+                            }
+                            if(m*curPoint.x() + b < curPoint.y()) {
+                                rightIsLower = false;
+                            }
+                        }
+                    }
+
+                    if(rightIsLower && leftIsLower) {
+                        topFound = true;
+                        topLeft = i;
+                        topRight = j;
+                        emit setLineYellow(lPoint,rPoint);
+                        this->msleep(100 * getDelayMultiplier());
+                    }
+                    if(rightIsHigher && leftIsHigher) {
+                        bottomFound = true;
+                        bottomLeft = i;
+                        bottomRight = j;
+                        emit setLineYellow(lPoint,rPoint);
+                        this->msleep(100 * getDelayMultiplier());
+                    }
+                    if(rightIsHigher && leftIsHigher && rightIsLower && leftIsLower) {
+                        qDebug("Error!!!!!");
+                    }
+
+                    if(topFound&&bottomFound) {
+                        break;
                     }
                 }
-            }
-            for(int k = 0; k < right.size(); k++){
-                QPoint curPoint = pointsArray[right[k]];
-                if(curPoint!=rPoint) {
-                    if(m*curPoint.x() + b > curPoint.y()) {
-                        rightIsHigher = false;
-                    }
-                    if(m*curPoint.x() + b < curPoint.y()) {
-                        rightIsLower = false;
-                    }
-                }
-            }
-
-            if(rightIsLower && leftIsLower) {
-                topFound = true;
-                topLeft = i;
-                topRight = j;
-                emit setLineYellow(lPoint,rPoint);
-                this->msleep(100 * getDelayMultiplier());
-            }
-            if(rightIsHigher && leftIsHigher) {
-                bottomFound = true;
-                bottomLeft = i;
-                bottomRight = j;
-                emit setLineYellow(lPoint,rPoint);
-                this->msleep(100 * getDelayMultiplier());
-            }
-
-            if(topFound&&bottomFound) {
-                break;
             }
         }
     }

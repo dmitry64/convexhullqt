@@ -72,7 +72,7 @@ void DrawWidget::drawMerge(QPainter &painter)
         painter.drawLine(first,second);
         painter.drawText(first.x()-8,first.y()-8,QString::number(i));
     }
-    if(_mergeHull1.size() > 2){
+    if(_mergeHull1.size() >= 2){
         painter.setPen(_mergePen);
         painter.drawLine(toScreenCoords(_points[_mergeHull1.last()]),toScreenCoords(_points[_mergeHull1.first()]));
         painter.drawText(toScreenCoords(_points[_mergeHull1.last()]).x()-8,
@@ -88,7 +88,7 @@ void DrawWidget::drawMerge(QPainter &painter)
         painter.drawLine(first,second);
         painter.drawText(first.x()-8,first.y()-8,QString::number(i));
     }
-    if(_mergeHull2.size() > 2) {
+    if(_mergeHull2.size() >= 2) {
         painter.setPen(_mergePen);
         painter.drawLine(toScreenCoords(_points[_mergeHull2.last()]),toScreenCoords(_points[_mergeHull2.first()]));
         painter.drawText(toScreenCoords(_points[_mergeHull2.last()]).x()-8,
